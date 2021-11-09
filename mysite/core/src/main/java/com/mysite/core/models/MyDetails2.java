@@ -1,11 +1,7 @@
 package com.mysite.core.models;
 
-import org.apache.sling.api.resource.Resource;
-import org.apache.sling.models.annotations.Model;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.adobe.cq.sightly.WCMUsePojo;
 
-import javax.inject.Inject;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -13,24 +9,11 @@ import java.time.Period;
 import java.util.Calendar;
 import java.util.Date;
 
-@Model(adaptables = Resource.class)
-public class MyDetailsModel {
-
-    Logger LOGGER = LoggerFactory.getLogger(this.getClass());
-
-    @Inject
+public class MyDetails2 extends WCMUsePojo {
     private String firstname;
-
-    @Inject
     private String lname;
-
-    @Inject
     private String birthdate;
-
-    @Inject
     private  String gender;
-
-    @Inject
     private String maritalstatus;
 
     public String getFirstname() {
@@ -53,29 +36,20 @@ public class MyDetailsModel {
         return maritalstatus;
     }
 
+
+    @Override
+    public void activate() throws Exception {
+        firstname = (String) getProperties().get("firstname");
+        lname = getProperties().get("lname", "");
+        gender = (String) getProperties().get("gender");
+        maritalstatus = (String) getProperties().get("maritalstatus");
+        birthdate = getProperties().get("birthdate","");
+
+    }
     public String getFullName()
     {
         return firstname + " "+ lname;
     }
-
-    public int getAge() throws ParseException {
-
-        //using Calendar Object
-        String s = getBirthdate();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Date d = simpleDateFormat.parse(s);
-        Calendar c = Calendar.getInstance();
-        c.setTime(d);
-        int year = c.get(Calendar.YEAR);
-        int month = c.get(Calendar.MONTH) + 1;
-        int date = c.get(Calendar.DATE);
-        LocalDate l1 = LocalDate.of(year, month, date);
-        LocalDate now1 = LocalDate.now();
-        int age = Period.between(l1, now1).getYears();
-        return age;
-
-    }
-
     public String getHonorific()
     {
         String gender=getGender();
@@ -94,7 +68,21 @@ public class MyDetailsModel {
             return "Mrs";
         }
     }
+    public int getAge() throws ParseException {
+
+        String s = getBirthdate();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date d = simpleDateFormat.parse(s);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(d);
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH) + 1;
+        int date = cal.get(Calendar.DATE);
+        LocalDate l1 = LocalDate.of(year, month, date);
+        LocalDate now1 = LocalDate.now();
+        int age = Period.between(l1, now1).getYears();
+        return age;
+
+    }
+
 }
-
-
-
